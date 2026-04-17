@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Beneficiaire {
+  id          String @id @default(cuid())
+  nom_complet String
+  telephone   String
+  recus       Recu[]
+}
+
+model Recu {
+  id             String       @id @default(cuid())
+  numeroId       String       @unique
+  numero         Numero       @relation(fields: [numeroId], references: [id])
+  date           DateTime     @default(now())
+  beneficiaireId String
+  beneficiaire   Beneficiaire @relation(fields: [beneficiaireId], references: [id])
+  montant        Float        @default(100000)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+}
+
+model Numero {
+  id        String   @id @default(cuid())
+  numero    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  recu      Recu?
+}
