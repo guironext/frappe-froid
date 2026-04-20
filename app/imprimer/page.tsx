@@ -104,13 +104,13 @@ function RecuSheet({
 			<div className="text-black text-2xl text-center font-bold uppercase flex w-full items-center justify-between gap-2 my-4 print:my-2 print:text-lg">
 				<div className="flex flex-col items-center gap-2">
 					<p className="font-normal bg-gray-200 p-3">Caissière :</p>
-					<p className="font-normal bg-gray-200 p-3">
-						{recu.user.nom} {recu.user.prenom}
+					<p className="font-normal text-black text-xl pt-2 text-center">
+						{recu.user.prenom}
 					</p>
 				</div>
 				<div className="flex flex-col items-center gap-2">
 					<p className="font-normal bg-gray-200 p-3">Bénéficiaire:</p>
-					<p className="font-normal bg-gray-200 p-3">
+					<p className="font-normal text-black text-xl pt-2 text-center">
 						{recu.beneficiaire.nom_complet}
 					</p>
 				</div>
