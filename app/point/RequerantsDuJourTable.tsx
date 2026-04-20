@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTransition } from "react"
 import { toast } from "sonner"
+import * as XLSX from "xlsx"
 import { deleteBeneficiaire } from "./actions"
 
 export type RequerantDuJourRow = {
@@ -82,9 +83,74 @@ function IconTrash(props: SVGProps<SVGSVGElement>) {
 	)
 }
 
+function IconFileExcel(props: SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden
+			{...props}
+		>
+			<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z" />
+			<path d="M14 3v6h6" />
+			<path d="m9 13 6 6" />
+			<path d="m15 13-6 6" />
+		</svg>
+	)
+}
+
 export function RequerantsDuJourTable({ rows }: { rows: RequerantDuJourRow[] }) {
 	const router = useRouter()
 	const [pending, startTransition] = useTransition()
+
+	function handleExportExcel() {
+		if (rows.length === 0) {
+			toast.error("Aucune donnée à exporter.")
+			return
+		}
+
+		try {
+			const totalMontant = rows.reduce((acc, row) => acc + row.montantPaye, 0)
+
+			const data = rows.map((row) => ({
+				"N° Reçu": row.numero,
+				Nom: row.nom,
+				Contact: row.contact,
+				"Montant payé (F CFA)": row.montantPaye,
+			}))
+
+			data.push({
+				"N° Reçu": "",
+				Nom: "TOTAL",
+				Contact: "",
+				"Montant payé (F CFA)": totalMontant,
+			})
+
+			const worksheet = XLSX.utils.json_to_sheet(data)
+			worksheet["!cols"] = [{ wch: 14 }, { wch: 28 }, { wch: 20 }, { wch: 20 }]
+
+			const workbook = XLSX.utils.book_new()
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Réquérants du jour")
+
+			const today = new Date()
+			const yyyy = today.getFullYear()
+			const mm = String(today.getMonth() + 1).padStart(2, "0")
+			const dd = String(today.getDate()).padStart(2, "0")
+			const filename = `requerants-du-jour-${yyyy}-${mm}-${dd}.xlsx`
+
+			XLSX.writeFile(workbook, filename)
+			toast.success("Export Excel réussi")
+		} catch {
+			toast.error("Impossible d'exporter le fichier Excel.")
+		}
+	}
 
 	function handleDelete(beneficiaireId: string, nom: string) {
 		if (!window.confirm(`Supprimer le réquérant « ${nom} » et ses reçus associés ?`)) {
@@ -111,6 +177,29 @@ export function RequerantsDuJourTable({ rows }: { rows: RequerantDuJourRow[] }) 
 
 	return (
 		<div className="overflow-x-auto rounded-2xl border border-white/50 bg-white/50 shadow-inner">
+			<div className="flex justify-between items-center gap-2">
+				<div className="">
+				</div>
+				<button
+					type="button"
+					onClick={handleExportExcel}
+					className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-50"
+				>
+					<IconFileExcel />
+					Exporter vers Excel
+				</button>
+			</div>
+			
+				<div className="flex justify-between items-center gap-2">
+					<p className="text-sm text-zinc-700">
+						Nombre de réquérants du jour : <span className="font-bold">{rows.length}</span>
+					</p>
+					<p className="text-sm text-zinc-700">
+						Montant total collecté du jour : <span className="font-bold">{rows.reduce((acc, row) => acc + row.montantPaye, 0).toLocaleString("fr-FR")} F CFA</span>
+					</p>
+				</div>
+				
+			
 			<table className="w-full min-w-[min(100%,520px)] border-collapse text-left text-sm text-zinc-900">
 				<thead>
 					<tr className="border-b border-orange-200/80 bg-white/60 text-xs font-semibold uppercase tracking-wide text-orange-900">
