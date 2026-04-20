@@ -58,7 +58,7 @@ export default function SignUpPage() {
 							<SignUp
 								routing="path"
 								path="/sign-up"
-								fallbackRedirectUrl="/onboarding"
+								forceRedirectUrl="/onboarding"
 								signInUrl="/sign-in"
 								appearance={{
 									elements: { rootBox: "mx-auto" },
