@@ -25,8 +25,34 @@ function formatFCFA(amount: number) {
 async function createBeneficiaireAndRecu(formData: FormData) {
   "use server"
 
+  const { auth, currentUser } = await import("@clerk/nextjs/server")
   const { prisma } = await import("../lib/prisma")
   const { Prisma } = await import("@prisma/client")
+
+  const { userId } = await auth()
+  if (!userId) {
+    return { status: "error", message: "Connectez-vous pour creer un recu." } as const
+  }
+
+  const clerkUser = await currentUser()
+  const email =
+    clerkUser?.primaryEmailAddress?.emailAddress ??
+    clerkUser?.emailAddresses[0]?.emailAddress
+
+  if (!email) {
+    return {
+      status: "error",
+      message: "Aucune adresse e-mail sur votre compte Clerk.",
+    } as const
+  }
+
+  const dbUser = await prisma.user.findUnique({ where: { email } })
+  if (!dbUser) {
+    return {
+      status: "error",
+      message: "Completez d'abord l'onboarding (nom et prenom) sur /onboarding.",
+    } as const
+  }
 
   const nom_complet = String(formData.get("nom_complet") ?? "").trim()
   const telephone = String(formData.get("telephone") ?? "").trim()
@@ -61,6 +87,7 @@ async function createBeneficiaireAndRecu(formData: FormData) {
 
       await prisma.recu.create({
         data: {
+          user: { connect: { id: dbUser.id } },
           beneficiaire: {
             create: {
               nom_complet,

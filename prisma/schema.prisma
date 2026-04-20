@@ -11,6 +11,16 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  nom String
+  prenom String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  recus Recu[]
+}
+
 model Beneficiaire {
   id          String @id @default(cuid())
   nom_complet String
@@ -24,6 +34,8 @@ model Recu {
   numero         Numero       @relation(fields: [numeroId], references: [id])
   date           DateTime     @default(now())
   beneficiaireId String
+  userId String
+  user User @relation(fields: [userId], references: [id])
   beneficiaire   Beneficiaire @relation(fields: [beneficiaireId], references: [id])
   montant        Float        @default(100000)
   createdAt      DateTime     @default(now())

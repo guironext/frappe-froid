@@ -16,6 +16,7 @@ function formatMontant(amount: number): string {
 type RecuPourImpression = {
 	montant: number;
 	beneficiaire: { nom_complet: string; telephone: string };
+	user: { nom: string; prenom: string };
 };
 
 function RecuSheet({
@@ -101,8 +102,18 @@ function RecuSheet({
 			</div>
 
 			<div className="text-black text-2xl text-center font-bold uppercase flex w-full items-center justify-between gap-2 my-4 print:my-2 print:text-lg">
-				<p> Caissière : </p>
-				<p>Bénéficiaire:</p>
+				<div className="flex flex-col items-center gap-2">
+					<p className="font-normal bg-gray-200 p-3">Caissière :</p>
+					<p className="font-normal bg-gray-200 p-3">
+						{recu.user.nom} {recu.user.prenom}
+					</p>
+				</div>
+				<div className="flex flex-col items-center gap-2">
+					<p className="font-normal bg-gray-200 p-3">Bénéficiaire:</p>
+					<p className="font-normal bg-gray-200 p-3">
+						{recu.beneficiaire.nom_complet}
+					</p>
+				</div>
 			</div>
 		</div>
 	);
@@ -120,7 +131,7 @@ export default async function Page({
 	const recu = numero
 		? await prisma.recu.findFirst({
 				where: { numero: { numero } },
-				include: { beneficiaire: true, numero: true },
+				include: { beneficiaire: true, numero: true, user: true },
 			})
 		: null;
 
