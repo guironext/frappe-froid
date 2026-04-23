@@ -1,4 +1,7 @@
+import { auth, currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { prisma } from "../lib/prisma";
 import { PrintButton } from "./PrintButton";
 
 export const dynamic = "force-dynamic";
@@ -63,7 +66,7 @@ function RecuSheet({
 			<div className="flex w-full items-center justify-between">
 				<div></div>
 				<div className="text-red-500 text-xl font-bold uppercase"></div>
-				<div className="text-black text-2xl font-bold uppercase bg-gray-200 p-4 leading-tight print:p-2 print:text-xl">
+				<div className="text-black text-2xl font-bold uppercase bg-gray-50 p-2 leading-tight print:p-1 print:text-xl">
 					<p>B.P.F : # {formatMontant(recu.montant)} #</p>
 				</div>
 			</div>
@@ -75,42 +78,46 @@ function RecuSheet({
 			<div className="flex flex-col gap-2 w-full  justify-self-start mt-5 print:mt-3">
 				<div className="text-black text-lg text-center font-bold uppercase flex items-center gap-2 print:text-base">
 					<p>M / Mme :</p>
-					<p className="bg-gray-200 font-normal p-3 leading-tight print:p-1.5 print:text-sm">
+					<p className="bg-gray-50 font-normal p-1 leading-tight print:p-0 print:text-sm">
 						{" "}
 						{recu.beneficiaire.nom_complet}
 					</p>
 				</div>
 				<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-sm">
 					<p>N° de téléphone :</p>
-					<p className="bg-gray-200 p-3 font-normal leading-tight print:p-1.5 print:text-sm">
+					<p className="bg-gray-50 p-1 font-normal leading-tight print:p-1.5 print:text-sm">
 						{" "}
-						{recu.beneficiaire.telephone}
+						{recu.beneficiaire.telephone
+							?.toString()
+							.replace(/\D/g, "")
+							.match(/.{1,2}/g)
+							?.join(" ")}
 					</p>
 				</div>
 			</div>
 			<div className="flex w-full items-center justify-center ">
 				<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-sm">
 					<p> La somme de :</p>
-					<p className="uppercase text-black text-lg font-normal bg-gray-200 p-3 leading-tight print:p-1.5 print:text-sm">
+					<p className="uppercase text-black text-lg font-normal bg-gray-50 p-1 leading-tight print:p-0 print:text-sm">
 						cent mille francs CFA
 					</p>
 				</div>
 			</div>
 			<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-sm">
 				<p> Pour: </p>
-				<p className="font-normal bg-gray-200 p-3">Frappe à Froid</p>
+				<p className="font-normal bg-gray-50 p-1">Frappe à Froid</p>
 			</div>
 
 			<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center justify-between gap-y-2 my-2 print:my-2 print:text-sm">
 				<div className="flex flex-col items-center gap-2">
-					<p className="font-normal bg-gray-200 p-3">Caissière :</p>
-					<p className="font-normal text-black text-sm pt-2 text-center">
+					<p className="font-normal bg-gray-50 p-0">Caisse :</p>
+					<p className="font-normal text-black text-sm pt-1 text-center">
 						{recu.user.prenom}
 					</p>
 				</div>
 				<div className="flex flex-col items-center gap-2">
-					<p className="font-normal bg-gray-200 p-3">Bénéficiaire:</p>
-					<p className="font-normal text-black text-sm pt-2 text-center">
+					<p className="font-normal bg-gray-50 p-0">Bénéficiaire:</p>
+					<p className="font-normal text-black text-sm pt-1 text-center">
 						{recu.beneficiaire.nom_complet}
 					</p>
 				</div>
@@ -124,9 +131,27 @@ export default async function Page({
 }: {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+	const { userId } = await auth();
+	if (!userId) {
+		redirect("/sign-in");
+	}
+
+	const clerkUser = await currentUser();
+	const email =
+		clerkUser?.primaryEmailAddress?.emailAddress ??
+		clerkUser?.emailAddresses[0]?.emailAddress;
+
+	if (!email) {
+		redirect("/sign-in");
+	}
+
+	const dbUser = await prisma.user.findUnique({ where: { email } });
+	if (!dbUser) {
+		redirect("/onboarding");
+	}
+
 	const sp = await searchParams;
 	const numero = typeof sp.numero === "string" ? sp.numero : "";
-	const { prisma } = await import("../lib/prisma");
 
 	const recu = numero
 		? await prisma.recu.findFirst({

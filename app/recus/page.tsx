@@ -1,4 +1,8 @@
+import { auth } from "@clerk/nextjs/server"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+
+export const dynamic = "force-dynamic"
 
 const actions = [
   {
@@ -23,7 +27,12 @@ const actions = [
   },
 ]
 
-export default function RecusPage() {
+export default async function RecusPage() {
+  const { userId } = await auth()
+  if (!userId) {
+    redirect("/sign-in")
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#fef3c7_0%,#fb923c_40%,#7c2d12_100%)] px-4 py-6 sm:px-6 lg:px-10">
       <div className="absolute inset-0">

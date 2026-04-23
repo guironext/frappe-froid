@@ -1,6 +1,15 @@
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
 import { OnboardingForm } from "./OnboardingForm"
 
-export default function OnboardingPage() {
+export const dynamic = "force-dynamic"
+
+export default async function OnboardingPage() {
+	const { userId } = await auth()
+	if (!userId) {
+		redirect("/sign-in")
+	}
+
 	return (
 		<main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#fef3c7_0%,#f59e0b_45%,#7c2d12_100%)] px-3 py-4 sm:px-6 sm:py-6 lg:px-10">
 			<div className="absolute inset-0">

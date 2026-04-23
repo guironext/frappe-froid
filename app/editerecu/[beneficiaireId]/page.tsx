@@ -1,5 +1,6 @@
+import { auth, currentUser } from "@clerk/nextjs/server"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { prisma } from "../../lib/prisma"
 import { updateBeneficiaire } from "./actions"
 import { EditBeneficiaireForm } from "./EditBeneficiaireForm"
@@ -11,6 +12,25 @@ export default async function Page({
 }: {
 	params: Promise<{ beneficiaireId: string }>
 }) {
+	const { userId } = await auth()
+	if (!userId) {
+		redirect("/sign-in")
+	}
+
+	const clerkUser = await currentUser()
+	const email =
+		clerkUser?.primaryEmailAddress?.emailAddress ??
+		clerkUser?.emailAddresses[0]?.emailAddress
+
+	if (!email) {
+		redirect("/sign-in")
+	}
+
+	const dbUser = await prisma.user.findUnique({ where: { email } })
+	if (!dbUser) {
+		redirect("/onboarding")
+	}
+
 	const { beneficiaireId } = await params
 
 	const beneficiaire = await prisma.beneficiaire.findUnique({

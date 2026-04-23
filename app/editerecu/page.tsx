@@ -1,4 +1,7 @@
+import { auth, currentUser } from "@clerk/nextjs/server"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import { prisma } from "../lib/prisma"
 import { CreateBeneficiaireForm } from "./CreateBeneficiaireForm"
 
 export const dynamic = "force-dynamic"
@@ -133,6 +136,25 @@ async function createBeneficiaireAndRecu(formData: FormData) {
 }
 
 export default async function Page() {
+  const { userId } = await auth()
+  if (!userId) {
+    redirect("/sign-in")
+  }
+
+  const clerkUser = await currentUser()
+  const email =
+    clerkUser?.primaryEmailAddress?.emailAddress ??
+    clerkUser?.emailAddresses[0]?.emailAddress
+
+  if (!email) {
+    redirect("/sign-in")
+  }
+
+  const dbUser = await prisma.user.findUnique({ where: { email } })
+  if (!dbUser) {
+    redirect("/onboarding")
+  }
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#fef3c7_0%,#fb923c_40%,#7c2d12_100%)] px-4 py-6 sm:px-6 lg:px-10">
       <section className="relative mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center justify-center">

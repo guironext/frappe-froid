@@ -1,5 +1,6 @@
 "use server"
 
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { prisma } from "../../lib/prisma"
 
@@ -13,6 +14,11 @@ export async function updateBeneficiaire(
 	_prevState: EditBeneficiaireState,
 	formData: FormData,
 ): Promise<EditBeneficiaireState> {
+	const { userId } = await auth()
+	if (!userId) {
+		return { status: "error", message: "Connectez-vous pour modifier." }
+	}
+
 	const nom_complet = String(formData.get("nom_complet") ?? "").trim()
 	const telephone = String(formData.get("telephone") ?? "").trim()
 
