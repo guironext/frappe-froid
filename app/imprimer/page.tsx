@@ -47,7 +47,7 @@ function RecuSheet({
 					alt="logo"
 					width={150}
 					height={150}
-					className="h-[150px] w-[150px] object-contain print:h-[130px] print:w-[130px]"
+					className="h-[150px] w-[150px] object-contain print:h-[130px] print:w-[130px] bg-gray-50"
 				/>
 				<div className=" text-black font-bold text-3xl gap-4 uppercase items-center justify-center print:text-2xl flex ">
 					<h1>Reçu</h1>
@@ -110,14 +110,14 @@ function RecuSheet({
 
 			<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center justify-between gap-y-2 my-2 print:my-2 print:text-sm">
 				<div className="flex flex-col items-center gap-2">
-					<p className="font-normal bg-gray-50 p-0">Caisse :</p>
-					<p className="font-normal text-black text-sm pt-1 text-center">
+					<p className="font-bold bg-gray-50 p-0">Caisse :</p>
+					<p className="font-normal text-black italic text-[10px] pt-1 text-center">
 						{recu.user.prenom}
 					</p>
 				</div>
 				<div className="flex flex-col items-center gap-2">
-					<p className="font-normal bg-gray-50 p-0">Bénéficiaire:</p>
-					<p className="font-normal text-black text-sm pt-1 text-center">
+					<p className="font-bold bg-gray-50 p-0">Bénéficiaire:</p>
+					<p className="font-normal text-black italic text-[10px] pt-1 text-center">
 						{recu.beneficiaire.nom_complet}
 					</p>
 				</div>
