@@ -46,9 +46,9 @@ function RecuSheet({
 					height={150}
 					className="h-[150px] w-[150px] object-contain print:h-[130px] print:w-[130px]"
 				/>
-				<div className=" text-black font-bold text-5xl gap-4 uppercase items-center justify-center print:text-4xl flex ">
+				<div className=" text-black font-bold text-3xl gap-4 uppercase items-center justify-center print:text-2xl flex ">
 					<h1>Reçu</h1>
-					<h1 className="text-red-500  font-bold uppercase text-5xl print:text-4xl"> N° : {numero}</h1>
+					<h1 className="text-red-500  font-bold uppercase text-3xl print:text-2xl"> N° : {numero}</h1>
 				</div>
 				<Image
 					src="/logo3.jpeg"
@@ -73,44 +73,44 @@ function RecuSheet({
 				</p>
 			</div>
 			<div className="flex flex-col gap-2 w-full  justify-self-start mt-5 print:mt-3">
-				<div className="text-black text-xl text-center font-bold uppercase flex items-center gap-2 print:text-lg">
+				<div className="text-black text-lg text-center font-bold uppercase flex items-center gap-2 print:text-base">
 					<p>M / Mme :</p>
-					<p className="bg-gray-200 font-normal p-3 leading-tight print:p-1.5 print:text-base">
+					<p className="bg-gray-200 font-normal p-3 leading-tight print:p-1.5 print:text-sm">
 						{" "}
 						{recu.beneficiaire.nom_complet}
 					</p>
 				</div>
-				<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-base">
+				<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-sm">
 					<p>N° de téléphone :</p>
-					<p className="bg-gray-200 p-3 font-normal leading-tight print:p-1.5 print:text-base">
+					<p className="bg-gray-200 p-3 font-normal leading-tight print:p-1.5 print:text-sm">
 						{" "}
 						{recu.beneficiaire.telephone}
 					</p>
 				</div>
 			</div>
-			<div className="flex w-full items-center justify-center mt-4 print:mt-3">
-				<div className="text-black text-xl text-center font-bold uppercase flex w-full items-center gap-2 print:text-lg">
+			<div className="flex w-full items-center justify-center ">
+				<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-sm">
 					<p> La somme de :</p>
-					<p className="uppercase text-black text-xl font-normal bg-gray-200 p-3 leading-tight print:p-1.5 print:text-base">
+					<p className="uppercase text-black text-lg font-normal bg-gray-200 p-3 leading-tight print:p-1.5 print:text-sm">
 						cent mille francs CFA
 					</p>
 				</div>
 			</div>
-			<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 mt-4 print:mt-3 print:text-base">
+			<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center gap-2 print:text-sm">
 				<p> Pour: </p>
 				<p className="font-normal bg-gray-200 p-3">Frappe à Froid</p>
 			</div>
 
-			<div className="text-black text-2xl text-center font-bold uppercase flex w-full items-center justify-between gap-2 my-4 print:my-2 print:text-lg">
+			<div className="text-black text-lg text-center font-bold uppercase flex w-full items-center justify-between gap-y-2 my-2 print:my-2 print:text-sm">
 				<div className="flex flex-col items-center gap-2">
 					<p className="font-normal bg-gray-200 p-3">Caissière :</p>
-					<p className="font-normal text-black text-xl pt-2 text-center">
+					<p className="font-normal text-black text-sm pt-2 text-center">
 						{recu.user.prenom}
 					</p>
 				</div>
 				<div className="flex flex-col items-center gap-2">
 					<p className="font-normal bg-gray-200 p-3">Bénéficiaire:</p>
-					<p className="font-normal text-black text-xl pt-2 text-center">
+					<p className="font-normal text-black text-sm pt-2 text-center">
 						{recu.beneficiaire.nom_complet}
 					</p>
 				</div>
