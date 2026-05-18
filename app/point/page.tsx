@@ -1,6 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { prisma } from "../lib/prisma";
 import { RequerantsDuJourTable } from "./RequerantsDuJourTable";
 import { RequerantsParDateTable } from "./RequerantsParDateTable";
@@ -20,38 +18,17 @@ function endOfLocalDay(d: Date) {
 }
 
 export default async function Page() {
-	const { userId } = await auth();
-	if (!userId) {
-		redirect("/sign-in");
-	}
-
-	const clerkUser = await currentUser();
-	const email =
-		clerkUser?.primaryEmailAddress?.emailAddress ??
-		clerkUser?.emailAddresses[0]?.emailAddress;
-
-	if (!email) {
-		redirect("/sign-in");
-	}
-
-	const dbUser = await prisma.user.findUnique({ where: { email } });
-	if (!dbUser) {
-		redirect("/onboarding");
-	}
-
 	const now = new Date();
 	const jourDebut = startOfLocalDay(now);
 	const jourFin = endOfLocalDay(now);
 
 	const [nombreRequerants, aggregate, recusDuJour, recusTous] = await Promise.all([
-		prisma.recu.count({ where: { userId: dbUser.id } }),
+		prisma.recu.count(),
 		prisma.recu.aggregate({
 			_sum: { montant: true },
-			where: { userId: dbUser.id },
 		}),
 		prisma.recu.findMany({
 			where: {
-				userId: dbUser.id,
 				date: {
 					gte: jourDebut,
 					lte: jourFin,
@@ -61,7 +38,6 @@ export default async function Page() {
 			orderBy: { date: "asc" },
 		}),
 		prisma.recu.findMany({
-			where: { userId: dbUser.id },
 			include: { beneficiaire: true, numero: true },
 			orderBy: [{ date: "asc" }, { beneficiaire: { nom_complet: "asc" } }],
 		}),
