@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { prisma } from "../lib/prisma";
+import { formatRecuNumeroDisplay } from "@/app/lib/recu-numero";
 import { PrintButton } from "./PrintButton";
 
 export const dynamic = "force-dynamic";
@@ -164,6 +165,10 @@ export default async function Page({
 		? new Date(recu.date).toLocaleDateString("fr-FR")
 		: "";
 
+	const numeroAffiche = formatRecuNumeroDisplay(
+		recu?.numero.numero ?? numero,
+	);
+
 	return (
 		<main className="a4-portrait-dual-print relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#fef3c7_0%,#fb923c_40%,#7c2d12_100%)] px-4 py-6 print:min-h-0 print:bg-white print:p-0 sm:px-6 lg:px-10">
 			<section className="relative mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl flex-col items-center justify-center gap-6 print:min-h-0 print:max-w-none print:justify-start print:py-0 print:gap-0">
@@ -184,7 +189,7 @@ export default async function Page({
 						<div className="print:hidden w-full">
 							<RecuSheet
 								recu={recu}
-								numero={numero}
+								numero={numeroAffiche}
 								datePaiement={datePaiement}
 							/>
 						</div>
@@ -192,7 +197,7 @@ export default async function Page({
 							<div className="print-dual-slot">
 								<RecuSheet
 									recu={recu}
-									numero={numero}
+									numero={numeroAffiche}
 									datePaiement={datePaiement}
 								/>
 							</div>
@@ -200,7 +205,7 @@ export default async function Page({
 							<div className="print-dual-slot">
 								<RecuSheet
 									recu={recu}
-									numero={numero}
+									numero={numeroAffiche}
 									datePaiement={datePaiement}
 								/>
 							</div>

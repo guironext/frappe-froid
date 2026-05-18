@@ -1,4 +1,5 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "../lib/prisma";
 import { RequerantsDuJourTable } from "./RequerantsDuJourTable";
@@ -120,8 +121,8 @@ export default async function Page() {
 						<div className="absolute inset-x-8 top-0 h-px bg-white/70" />
 
 						<div className="relative flex flex-col gap-8">
-							<header className="flex flex-col ">
-								<div className="flex flex-col justify-between items-center">
+							<header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+								<div className="flex flex-col justify-between items-center w-full sm:items-start">
 									<div className="flex items-center justify-between w-full">
 										<div className="inline-flex rounded-full border border-orange-200 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-orange-700 shadow-sm">
 											<p>Nombre de bénéficiaires :</p>
@@ -136,6 +137,14 @@ export default async function Page() {
 										Liste des Bénéficiaires
 									</h1>
 								</div>
+
+								<Link
+									href="/recus"
+									prefetch={false}
+									className="inline-flex min-h-11 shrink-0 items-center justify-center self-center rounded-2xl bg-white/80 px-5 py-3 text-sm font-medium text-orange-700 shadow-lg shadow-orange-950/5 ring-1 ring-orange-200 transition hover:bg-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:self-start"
+								>
+									Retour
+								</Link>
 							</header>
 
 							<div className="flex flex-col gap-4">

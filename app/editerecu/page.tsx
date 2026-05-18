@@ -2,16 +2,10 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { prisma } from "../lib/prisma"
+import { getNextRecuNumero } from "@/app/lib/recu-numero"
 import { CreateBeneficiaireForm } from "./CreateBeneficiaireForm"
 
 export const dynamic = "force-dynamic"
-
-/** First issued receipt number (five digits, leading zeros). */
-const FIRST_RECU_NUMERO_INT = 1249
-
-function formatRecuNumero(n: number) {
-  return String(n).padStart(5, "0")
-}
 
 function formatFCFA(amount: number) {
   const formatted = new Intl.NumberFormat("fr-FR", {
@@ -68,25 +62,7 @@ async function createBeneficiaireAndRecu(formData: FormData) {
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     try {
-      const rows = await prisma.numero.findMany({
-        select: { numero: true },
-      })
-
-      let last = FIRST_RECU_NUMERO_INT - 1
-      for (const { numero: n } of rows) {
-        if (/^\d{5}$/.test(n)) {
-          const v = Number.parseInt(n, 10)
-          if (!Number.isNaN(v)) last = Math.max(last, v)
-        }
-      }
-
-      const next = last + 1
-
-      if (next > 99_999) {
-        throw new Error("Numero de recu maximum (99999) atteint.")
-      }
-
-      const numero = formatRecuNumero(next)
+      const numero = await getNextRecuNumero(prisma)
 
       await prisma.recu.create({
         data: {
